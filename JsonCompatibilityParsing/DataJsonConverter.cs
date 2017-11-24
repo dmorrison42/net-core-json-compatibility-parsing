@@ -21,7 +21,7 @@ namespace JsonCompatibilityParsing
             {
                 case JArray array:
                     if (array.Count != 2) throw fail;
-                    return new Data(array[0].Value<string>(), array[0].Value<string>());
+                    return new Data(array[0].Value<string>(), array[1].Value<string>());
                 case JObject obj:
                     var stringValue = obj.Value<string>("StringValue") ?? obj.Value<string>("String");
                     var privateValue = obj.Value<string>("PrivateValue") ?? obj.Value<string>("Private");
