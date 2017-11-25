@@ -6,6 +6,12 @@ namespace JsonCompatibilityParsing
 {
     class Program
     {
+        static Data Expected = new Data
+        {
+            First = "Hello",
+            Second = "World",
+        };
+
         static string[] JsonBlobs => new[] {
             JArray.FromObject(new [] {
                 "Hello",
@@ -14,12 +20,12 @@ namespace JsonCompatibilityParsing
             JObject.FromObject(new
             {
                 StringValue = "Hello",
-                PrivateValue = "World"
+                SecondValue = "World"
             }).ToString(),
             JObject.FromObject(new
             {
-                String = "Hello",
-                Private = "World"
+                First = "Hello",
+                Second = "World"
             }).ToString(),
         };
 

@@ -1,17 +1,34 @@
 ﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using System;
 
 namespace JsonCompatibilityParsing
 {
-    [JsonConverter(typeof(DataJsonConverter))]
+    [JsonConverter(typeof(JsonTokenConstructor))]
     class Data
     {
-        public string StringValue { set; get; }
-        private string PrivateValue { set; get; }
+        public string First { set; get; }
+        public string Second { set; get; }
 
-        public Data(string stringValue, string privateValue)
+        public Data() { }
+
+        [JsonConstructor]
+        public Data(JToken token)
         {
-            StringValue = stringValue;
-            PrivateValue = privateValue;
+            var fail = new Exception("This just isn't what I'm looking for in an object!");
+            switch (token)
+            {
+                case JArray array:
+                    if (array.Count != 2) throw fail;
+                    First = array[0].Value<string>();
+                    Second = array[1].Value<string>();
+                    return;
+                case JObject obj:
+                    First = obj.Value<string>("First") ?? obj.Value<string>("StringValue") ?? obj.Value<string>("String");
+                    Second = obj.Value<string>("Second") ?? obj.Value<string>("SecondValue");
+                    return;
+            }
+            throw fail;
         }
 
         // override object.Equals
@@ -29,13 +46,13 @@ namespace JsonCompatibilityParsing
                 return false;
             }
             var other = (Data)obj;
-            return StringValue == other.StringValue && PrivateValue == other.PrivateValue;
+            return First == other.First && Second == other.Second;
         }
 
         // override object.GetHashCode
         public override int GetHashCode()
         {
-            return StringValue.GetHashCode() ^ PrivateValue.GetHashCode();
+            return First.GetHashCode() ^ Second.GetHashCode();
         }
 
         public static bool operator ==(Data current, object other)
@@ -50,7 +67,7 @@ namespace JsonCompatibilityParsing
 
         public override string ToString()
         {
-            return $"Data: ({StringValue}, {PrivateValue})";
+            return $"Data: ({First}, {Second})";
         }
     }
 }

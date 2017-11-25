@@ -18,25 +18,38 @@ This isn't even necessarily a breaking change depending on how much your users a
 
 I don't have an example of this, but because you receive a JObject, it's not really hard to do anything you want to do to read data in.
 
-## How it works
+### Usage
 
 There's not a lot of code here, so reading it all isn't hard, but heres the tl;dr:
 
-- Add a `JsonConverterAttribute` to your class ([Data.cs](JsonCompatibilityParsing/Data.cs))
+- Add a `JsonTokenConstructorAttribute` to your class ([Data.cs](JsonCompatibilityParsing/Data.cs))
 
     ```C#
-    [JsonConverter(typeof(DataJsonConverter))]
+    [JsonConverter(typeof(JsonTokenConstructor))]
     ```
+- Mark the constructor with the `JsonConstructorAttribute`
+    ```C#
+    [JsonConstructor]
+    public Data(JToken token)
+    ```
+- ...
+- Profit!
 
-- Add a JSON Converter ([DataJsonConverter.cs](JsonCompatibilityParsing/DataJsonConverter.cs))
-    - Implement the `JsonConverter` abstract class
-    - Turn off writing if your class is already doing it correctly
-        ```C#
-        public override bool CanWrite => false;
-        ```
-    - Convert your `JsonReader` to a `JToken` (optional)
-        ```C#
-        var token = JToken.ReadFrom(reader);
-        ```
-    - ...
-    - Profit!
+### How it works
+
+- Implements the `JsonConverter` abstract class
+- Turns off writing (your class should do that correctly)
+    ```C#
+    public override bool CanWrite => false;
+    ```
+- Converts the `JsonReader` to a `JToken`
+    ```C#
+    var token = JToken.ReadFrom(reader);
+    ```
+- Passes that to the marked constructor
+
+### TODO:
+
+- Remove the requirement to mark the constructor
+- Learn what existingValue is for
+- Handle Population
