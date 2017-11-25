@@ -31,6 +31,11 @@ namespace JsonCompatibilityParsing
 
         static void Main(string[] args)
         {
+            Console.WriteLine("Expected");
+            Console.WriteLine(JObject.FromObject(Expected).ToString());
+            Console.WriteLine("");
+
+            // Test building from scratch
             JsonBlobs
                 .Select(s => new
                 {
@@ -40,11 +45,11 @@ namespace JsonCompatibilityParsing
                 .ToList()
                 .ForEach(obj =>
                 {
+                    Console.WriteLine("Input (Creation):");
                     Console.WriteLine(obj.Json);
-                    Console.WriteLine(obj.Object);
-                    Console.WriteLine(JToken.FromObject(obj.Object).ToString());
+                    Console.WriteLine($"Got Expected: {obj.Object == Expected}\n");
                 });
-                Console.ReadKey();
+            Console.ReadKey();
         }
     }
 }
