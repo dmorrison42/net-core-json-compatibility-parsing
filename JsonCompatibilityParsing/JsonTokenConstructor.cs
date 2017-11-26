@@ -31,14 +31,39 @@ namespace JsonCompatibilityParsing
                     Parameters = c.GetParameters().ToArray(),
                 })
                 // Ignore constructors with more than two parameters
-                .Where(ci => ci.Parameters.Length > 0 && ci.Parameters.Length <= 2)
+                .Where(ci => ci.Parameters.Length <= 2)
                 // Ignore constructors where the first argument isn't a JToken
                 .Where(ci => typeof(JToken).IsAssignableFrom(ci.Parameters.FirstOrDefault()?.ParameterType))
                 // Ignore constructors where the second argument isn't an object
                 .Where(ci => new[] { null, typeof(object) }.Contains(ci.Parameters.Skip(1).FirstOrDefault()?.ParameterType))
                 .ToArray();
-            
-            if (constructorInfo.Length > 1) throw new Exception("Ambiguous JToken constructor");
+
+            // Pick the most specific constructor from JArray, JObject, and JToken
+            if (constructorInfo.Length > 1)
+            {
+                var filteredConstructorInfo = constructorInfo;
+                switch (token.Type)
+                {
+                    case JTokenType.Array:
+                        filteredConstructorInfo = constructorInfo
+                            .Where(ci => ci.Parameters.First().ParameterType == typeof(JArray))
+                            .ToArray();
+                        break;
+                    case JTokenType.Object:
+                        filteredConstructorInfo = constructorInfo
+                            .Where(ci => ci.Parameters.First().ParameterType == typeof(JObject))
+                            .ToArray();
+                        break;
+                }
+                if (filteredConstructorInfo.Length == 0)
+                {
+                    filteredConstructorInfo = constructorInfo
+                        .Where(ci => ci.Parameters.First().ParameterType == typeof(JToken))
+                        .ToArray();
+                }
+                if (filteredConstructorInfo.Length > 1) throw new Exception("Ambiguous JToken constructor");
+                constructorInfo = filteredConstructorInfo;
+            }
             if (constructorInfo.Length == 0) {
                 throw new Exception($"No JToken constructor found {objectType.Name}(JToken token[, object existingValue = null])");
             }

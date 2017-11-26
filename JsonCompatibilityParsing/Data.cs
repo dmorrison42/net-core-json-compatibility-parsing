@@ -12,22 +12,17 @@ namespace JsonCompatibilityParsing
 
         public Data() { }
 
-        public Data(JToken token)
+        public Data(JArray array)
         {
-            var fail = new Exception("This just isn't what I'm looking for in an object!");
-            switch (token)
-            {
-                case JArray array:
-                    if (array.Count != 2) throw fail;
-                    First = array[0].Value<string>();
-                    Second = array[1].Value<string>();
-                    return;
-                case JObject obj:
-                    First = obj.Value<string>("First") ?? obj.Value<string>("StringValue") ?? obj.Value<string>("String");
-                    Second = obj.Value<string>("Second") ?? obj.Value<string>("SecondValue");
-                    return;
-            }
-            throw fail;
+            if (array.Count != 2) throw new Exception("This just isn't what I'm looking for in an object!");
+            First = array[0].Value<string>();
+            Second = array[1].Value<string>();
+        }
+
+        public Data(JObject obj)
+        {
+            First = obj.Value<string>("First") ?? obj.Value<string>("StringValue") ?? obj.Value<string>("String");
+            Second = obj.Value<string>("Second") ?? obj.Value<string>("SecondValue");
         }
 
         // override object.Equals

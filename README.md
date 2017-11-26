@@ -49,10 +49,18 @@ There's not a lot of code here, so reading it all isn't hard, but heres the tl;d
     ```C#
     var token = JToken.ReadFrom(reader);
     ```
-- Passes that to the marked constructor
+- Selects a constructor
+    - Get all constructors
+    - Filter out constructors with more than 2 parameters
+    - Select only the constructors where the first parameter implements JToken
+    - Filter out constructors where the second argument isn't object
+    - If there is more than one constructor remaining
+        - Get only the constructors that are the correct type (JObject or JArray)
+        - If there are no constructors select only the JToken type
+    - If there is exactly one remaining constructor, use that
+- Pass the token and the existingValue (optional) to the selected constructor
 
 ### TODO:
 
-- Allow for per JToken Type constructors
 - Learn what existingValue is for
 - Handle Population
