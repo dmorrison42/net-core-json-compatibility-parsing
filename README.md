@@ -23,11 +23,14 @@ I don't have an example of this, but because you receive a JObject, it's not rea
 There's not a lot of code here, so reading it all isn't hard, but heres the tl;dr:
 
 - Add a `JsonTokenConstructorAttribute` to your class ([Data.cs](JsonCompatibilityParsing/Data.cs))
-
     ```C#
     [JsonConverter(typeof(JsonTokenConstructor))]
     ```
-- Mark the constructor with the `JsonConstructorAttribute`
+- Create a constructor who's first argument inherits from JToken (second argument is optional)
+    ```C#
+    Data(JObject obj, object existingValue)
+    ```
+- (Optional) Mark the constructor with the `JsonConstructorAttribute`
     ```C#
     [JsonConstructor]
     public Data(JToken token)
@@ -50,6 +53,6 @@ There's not a lot of code here, so reading it all isn't hard, but heres the tl;d
 
 ### TODO:
 
-- Remove the requirement to mark the constructor
+- Allow for per JToken Type constructors
 - Learn what existingValue is for
 - Handle Population

@@ -12,7 +12,6 @@ namespace JsonCompatibilityParsing
 
         public Data() { }
 
-        [JsonConstructor]
         public Data(JToken token)
         {
             var fail = new Exception("This just isn't what I'm looking for in an object!");
